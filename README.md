@@ -60,7 +60,7 @@ _Previous projects which have used Mirrorbits:_
 
 ## Prerequisites
 
-* Go 1.11 or later
+* Go 1.18 or later
 * Protobuf (protoc)
 * Redis 3.2 or later (with [persistence](https://redis.io/topics/persistence) enabled)
 * GeoIP2 databases from [Maxmind](https://dev.maxmind.com/geoip/geoip2/geolite2/) (preferably updated regularly)
@@ -85,18 +85,9 @@ A docker "quick start" can be found [on the wiki](https://github.com/etix/mirror
 
 ### Manual build
 
-
-Go >= 1.11:
 ```
 $ git clone https://github.com/etix/mirrorbits.git
 $ cd mirrorbits
-$ sudo make install
-```
-
-Go < 1.11:
-```
-$ go get -u github.com/etix/mirrorbits
-$ cd $GOPATH/src/github.com/etix/mirrorbits
 $ sudo make install
 ```
 
