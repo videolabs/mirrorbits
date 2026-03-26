@@ -27,9 +27,9 @@ import (
 	"github.com/etix/mirrorbits/utils"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/howeyc/gopass"
 	"github.com/op/go-logging"
 	"github.com/pkg/errors"
+	"golang.org/x/term"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -67,7 +67,8 @@ func ParseCommands(args ...string) error {
 		}
 		if len(c.creds.Password) == 0 && core.RPCAskPass {
 			fmt.Print("Password: ")
-			passwd, err := gopass.GetPasswdMasked()
+			passwd, err := term.ReadPassword(int(os.Stdin.Fd()))
+			fmt.Println("")
 			if err != nil {
 				return err
 			}
