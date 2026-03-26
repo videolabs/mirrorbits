@@ -433,7 +433,8 @@ func (m *monitor) syncLoop() {
 			go func() {
 				err := m.trace.GetLastUpdate(mir.Mirror)
 				if err != nil && err != scan.ErrNoTrace {
-					if numError, ok := err.(*strconv.NumError); ok {
+					var numError *strconv.NumError
+					if errors.As(err, &numError) {
 						if numError.Err == strconv.ErrSyntax {
 							log.Warningf("[%s] parsing trace file failed: %s is not a valid timestamp", mir.Name, strconv.Quote(numError.Num))
 							return
@@ -550,7 +551,8 @@ func (m *monitor) healthCheckDo(mirror *mirrors.Mirror, url string, file string,
 	}
 
 	if err != nil {
-		if opErr, ok := err.(*net.OpError); ok {
+		var opErr *net.OpError
+		if errors.As(err, &opErr) {
 			log.Debugf("Op: %s | Net: %s | Addr: %s | Err: %s | Temporary: %t", opErr.Op, opErr.Net, opErr.Addr, opErr.Error(), opErr.Temporary())
 		}
 		reason := "Unreachable"
