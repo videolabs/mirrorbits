@@ -124,7 +124,7 @@ func TestGeoIPRecord_IsValid(t *testing.T) {
 type GeoIPMockCity struct {
 }
 
-func (g *GeoIPMockCity) Lookup(ipAddress net.IP, result interface{}) error {
+func (g *GeoIPMockCity) Lookup(ipAddress net.IP, result any) error {
 	var citydb CityDb
 	citydb.City.Names.En = "test1"
 	citydb.Country.Iso_Code = "test2"
@@ -141,7 +141,7 @@ func (g *GeoIPMockCity) Lookup(ipAddress net.IP, result interface{}) error {
 type GeoIPMockASN struct {
 }
 
-func (g *GeoIPMockASN) Lookup(ipAddress net.IP, result interface{}) error {
+func (g *GeoIPMockASN) Lookup(ipAddress net.IP, result any) error {
 	var asnDb ASNDb
 	asnDb.Autonomous_system_number = 42
 	asnDb.Autonomous_system_organization = "forty two"
@@ -151,7 +151,7 @@ func (g *GeoIPMockASN) Lookup(ipAddress net.IP, result interface{}) error {
 	return nil
 }
 
-func CopyStruct(src interface{}, dst interface{}) {
+func CopyStruct(src any, dst any) {
 	s := reflect.Indirect(reflect.ValueOf(src))
 	d := reflect.Indirect(reflect.ValueOf(dst))
 	CopyStructRec(s, d)

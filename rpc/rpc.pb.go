@@ -1698,7 +1698,7 @@ func RegisterCLIServer(s *grpc.Server, srv CLIServer) {
 	s.RegisterService(&_CLI_serviceDesc, srv)
 }
 
-func _CLI_GetVersion_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _CLI_GetVersion_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(empty.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1710,13 +1710,13 @@ func _CLI_GetVersion_Handler(srv interface{}, ctx context.Context, dec func(inte
 		Server:     srv,
 		FullMethod: "/CLI/GetVersion",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(CLIServer).GetVersion(ctx, req.(*empty.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CLI_Upgrade_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _CLI_Upgrade_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(empty.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1728,13 +1728,13 @@ func _CLI_Upgrade_Handler(srv interface{}, ctx context.Context, dec func(interfa
 		Server:     srv,
 		FullMethod: "/CLI/Upgrade",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(CLIServer).Upgrade(ctx, req.(*empty.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CLI_Reload_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _CLI_Reload_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(empty.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1746,13 +1746,13 @@ func _CLI_Reload_Handler(srv interface{}, ctx context.Context, dec func(interfac
 		Server:     srv,
 		FullMethod: "/CLI/Reload",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(CLIServer).Reload(ctx, req.(*empty.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CLI_ChangeStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _CLI_ChangeStatus_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(ChangeStatusRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1764,13 +1764,13 @@ func _CLI_ChangeStatus_Handler(srv interface{}, ctx context.Context, dec func(in
 		Server:     srv,
 		FullMethod: "/CLI/ChangeStatus",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(CLIServer).ChangeStatus(ctx, req.(*ChangeStatusRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CLI_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _CLI_List_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(empty.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1782,13 +1782,13 @@ func _CLI_List_Handler(srv interface{}, ctx context.Context, dec func(interface{
 		Server:     srv,
 		FullMethod: "/CLI/List",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(CLIServer).List(ctx, req.(*empty.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CLI_MirrorInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _CLI_MirrorInfo_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(MirrorIDRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1800,13 +1800,13 @@ func _CLI_MirrorInfo_Handler(srv interface{}, ctx context.Context, dec func(inte
 		Server:     srv,
 		FullMethod: "/CLI/MirrorInfo",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(CLIServer).MirrorInfo(ctx, req.(*MirrorIDRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CLI_AddMirror_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _CLI_AddMirror_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(Mirror)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1818,13 +1818,13 @@ func _CLI_AddMirror_Handler(srv interface{}, ctx context.Context, dec func(inter
 		Server:     srv,
 		FullMethod: "/CLI/AddMirror",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(CLIServer).AddMirror(ctx, req.(*Mirror))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CLI_UpdateMirror_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _CLI_UpdateMirror_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(Mirror)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1836,13 +1836,13 @@ func _CLI_UpdateMirror_Handler(srv interface{}, ctx context.Context, dec func(in
 		Server:     srv,
 		FullMethod: "/CLI/UpdateMirror",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(CLIServer).UpdateMirror(ctx, req.(*Mirror))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CLI_RemoveMirror_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _CLI_RemoveMirror_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(MirrorIDRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1854,13 +1854,13 @@ func _CLI_RemoveMirror_Handler(srv interface{}, ctx context.Context, dec func(in
 		Server:     srv,
 		FullMethod: "/CLI/RemoveMirror",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(CLIServer).RemoveMirror(ctx, req.(*MirrorIDRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CLI_GeoUpdateMirror_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _CLI_GeoUpdateMirror_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(MirrorIDRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1872,13 +1872,13 @@ func _CLI_GeoUpdateMirror_Handler(srv interface{}, ctx context.Context, dec func
 		Server:     srv,
 		FullMethod: "/CLI/GeoUpdateMirror",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(CLIServer).GeoUpdateMirror(ctx, req.(*MirrorIDRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CLI_RefreshRepository_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _CLI_RefreshRepository_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(RefreshRepositoryRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1890,13 +1890,13 @@ func _CLI_RefreshRepository_Handler(srv interface{}, ctx context.Context, dec fu
 		Server:     srv,
 		FullMethod: "/CLI/RefreshRepository",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(CLIServer).RefreshRepository(ctx, req.(*RefreshRepositoryRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CLI_ScanMirror_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _CLI_ScanMirror_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(ScanMirrorRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1908,13 +1908,13 @@ func _CLI_ScanMirror_Handler(srv interface{}, ctx context.Context, dec func(inte
 		Server:     srv,
 		FullMethod: "/CLI/ScanMirror",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(CLIServer).ScanMirror(ctx, req.(*ScanMirrorRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CLI_StatsFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _CLI_StatsFile_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(StatsFileRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1926,13 +1926,13 @@ func _CLI_StatsFile_Handler(srv interface{}, ctx context.Context, dec func(inter
 		Server:     srv,
 		FullMethod: "/CLI/StatsFile",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(CLIServer).StatsFile(ctx, req.(*StatsFileRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CLI_StatsMirror_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _CLI_StatsMirror_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(StatsMirrorRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1944,13 +1944,13 @@ func _CLI_StatsMirror_Handler(srv interface{}, ctx context.Context, dec func(int
 		Server:     srv,
 		FullMethod: "/CLI/StatsMirror",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(CLIServer).StatsMirror(ctx, req.(*StatsMirrorRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CLI_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _CLI_Ping_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(empty.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1962,13 +1962,13 @@ func _CLI_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{
 		Server:     srv,
 		FullMethod: "/CLI/Ping",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(CLIServer).Ping(ctx, req.(*empty.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CLI_GetMirrorLogs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _CLI_GetMirrorLogs_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(GetMirrorLogsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1980,13 +1980,13 @@ func _CLI_GetMirrorLogs_Handler(srv interface{}, ctx context.Context, dec func(i
 		Server:     srv,
 		FullMethod: "/CLI/GetMirrorLogs",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(CLIServer).GetMirrorLogs(ctx, req.(*GetMirrorLogsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CLI_MatchMirror_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _CLI_MatchMirror_Handler(srv any, ctx context.Context, dec func(any) error, interceptor grpc.UnaryServerInterceptor) (any, error) {
 	in := new(MatchRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -1998,7 +1998,7 @@ func _CLI_MatchMirror_Handler(srv interface{}, ctx context.Context, dec func(int
 		Server:     srv,
 		FullMethod: "/CLI/MatchMirror",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req any) (any, error) {
 		return srv.(CLIServer).MatchMirror(ctx, req.(*MatchRequest))
 	}
 	return interceptor(ctx, in, info, handler)
