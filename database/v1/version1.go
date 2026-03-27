@@ -9,7 +9,6 @@ import (
 	"github.com/etix/mirrorbits/core"
 	"github.com/etix/mirrorbits/database/interfaces"
 	"github.com/gomodule/redigo/redis"
-	"github.com/pkg/errors"
 )
 
 // NewUpgraderV1 upgrades the database from version 0 to 1
@@ -110,19 +109,19 @@ func (v *Version1) CreateMirrorIndex(a *actions) (map[int]string, error) {
 	// Get the v0 list of mirrors
 	mirrors, err := redis.Strings(conn.Do("LRANGE", "MIRRORS", "0", "-1"))
 	if err != nil {
-		return m, errors.WithStack(err)
+		return m, err
 	}
 
 	for _, name := range mirrors {
 		// Create a unique ID for the current mirror
 		id, err := redis.Int(conn.Do("INCR", "LAST_MID"))
 		if err != nil {
-			return m, errors.WithStack(err)
+			return m, err
 		}
 
 		// Assign the ID to the current mirror
 		if _, err = conn.Do("HSET", "V1_MIRRORS", id, name); err != nil {
-			return m, errors.WithStack(err)
+			return m, err
 		}
 
 		m[id] = name
@@ -145,7 +144,7 @@ func (v *Version1) RenameKeys(a *actions, m map[int]string) error {
 		if err == redis.ErrNil || IsErrNoSuchKey(err) {
 			continue
 		} else if err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 
 		// Rename the FILEINFO_<name>_<file> keys
@@ -162,7 +161,7 @@ func (v *Version1) RenameKeys(a *actions, m map[int]string) error {
 	// Get the list of files in the local repo
 	files, err := redis.Strings(conn.Do("SMEMBERS", "FILES"))
 	if err != nil && err != redis.ErrNil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	// Rename the keys within FILEMIRRORS_*
@@ -170,7 +169,7 @@ func (v *Version1) RenameKeys(a *actions, m map[int]string) error {
 		// Get the list of mirrors having each file
 		names, err := redis.Strings(conn.Do("SMEMBERS", fmt.Sprintf("FILEMIRRORS_%s", file)))
 		if err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 
 		for _, name := range names {
@@ -188,7 +187,7 @@ func (v *Version1) RenameKeys(a *actions, m map[int]string) error {
 			conn.Send("SADD", fmt.Sprintf("V1_FILEMIRRORS_%s", file), id)
 		}
 		if err := conn.Flush(); err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 
 		// Mark the key for renaming
@@ -207,14 +206,14 @@ func (v *Version1) FixMirrorID(a *actions, m map[int]string) error {
 	for id, name := range m {
 		err := CopyKey(conn, fmt.Sprintf("MIRROR_%s", name), fmt.Sprintf("V1_MIRROR_%d", id))
 		if err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 		conn.Send("HMSET", fmt.Sprintf("V1_MIRROR_%d", id), "ID", id, "name", name)
 		a.rename[fmt.Sprintf("V1_MIRROR_%d", id)] = fmt.Sprintf("MIRROR_%d", id)
 		a.delete = append(a.delete, fmt.Sprintf("MIRROR_%s", name))
 	}
 	if err := conn.Flush(); err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	return nil
@@ -226,7 +225,7 @@ func (v *Version1) RenameStats(a *actions, m map[int]string) error {
 
 	keys, err := redis.Strings(conn.Do("KEYS", "STATS_MIRROR_*"))
 	if err != nil && err != redis.ErrNil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	for _, key := range keys {
@@ -237,7 +236,7 @@ func (v *Version1) RenameStats(a *actions, m map[int]string) error {
 
 		stats, err := redis.StringMap(conn.Do("HGETALL", key))
 		if err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 
 		for identifier, value := range stats {
@@ -258,7 +257,7 @@ func (v *Version1) RenameStats(a *actions, m map[int]string) error {
 			a.rename["V1_"+key] = key
 		}
 		if err := conn.Flush(); err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 	}
 

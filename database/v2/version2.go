@@ -9,7 +9,6 @@ import (
 	"github.com/etix/mirrorbits/core"
 	"github.com/etix/mirrorbits/database/interfaces"
 	"github.com/gomodule/redigo/redis"
-	"github.com/pkg/errors"
 )
 
 // NewUpgraderV2 upgrades the database from version 1 to 2
@@ -77,7 +76,7 @@ func (v *Version2) UpdateMirrors(a *actions) error {
 	// Get the list of mirrors
 	keys, err := redis.Strings(conn.Do("KEYS", "MIRROR_*"))
 	if err != nil && err != redis.ErrNil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	// Iterate on mirrors
@@ -86,20 +85,20 @@ func (v *Version2) UpdateMirrors(a *actions) error {
 		key := "V2_" + keyProd
 		err := CopyKey(conn, keyProd, key)
 		if err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 
 		// Get the http url
 		url, err := redis.String(conn.Do("HGET", key, "http"))
 		if err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 
 		// Get the status. Note that the key might not exist if ever
 		// the mirror was never enabled or scanned successfully.
 		up, err := redis.Bool(conn.Do("HGET", key, "up"))
 		if err != nil && err != redis.ErrNil {
-			return errors.WithStack(err)
+			return err
 		}
 		upExists := true
 		if err == redis.ErrNil {
@@ -109,7 +108,7 @@ func (v *Version2) UpdateMirrors(a *actions) error {
 		// Get the excluded reason. As above: the key might not exist.
 		reason, err := redis.String(conn.Do("HGET", key, "excludeReason"))
 		if err != nil && err != redis.ErrNil {
-			return errors.WithStack(err)
+			return err
 		}
 		reasonExists := true
 		if err == redis.ErrNil {
@@ -146,7 +145,7 @@ func (v *Version2) UpdateMirrors(a *actions) error {
 		// Finalize the transaction
 		_, err = conn.Do("EXEC")
 		if err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 
 		// Mark the key for renaming
