@@ -722,16 +722,15 @@ func (c *CLI) StatsFile(ctx context.Context, in *StatsFileRequest) (*StatsFileRe
 	for _, res := range stats {
 		line, ok := res.([]any)
 		if !ok {
-			return nil, fmt.Errorf("typecast failed: %w", err)
-		} else {
-			stats := []any(line)
-			for i := 0; i < len(stats); i += 2 {
-				path, _ := redis.String(stats[i], nil)
-				matched := re.MatchString(path)
-				if matched {
-					reqs, _ := redis.Int64(stats[i+1], nil)
-					reply.Files[path] += reqs
-				}
+			return nil, errors.New("typecast failed")
+		}
+		stats := []any(line)
+		for i := 0; i < len(stats); i += 2 {
+			path, _ := redis.String(stats[i], nil)
+			matched := re.MatchString(path)
+			if matched {
+				reqs, _ := redis.Int64(stats[i+1], nil)
+				reply.Files[path] += reqs
 			}
 		}
 	}
