@@ -6,6 +6,7 @@ package logs
 import (
 	"bytes"
 	"errors"
+	"io"
 	"io/ioutil"
 	"os"
 	"reflect"
@@ -127,7 +128,7 @@ func TestReloadRuntimeLogs(t *testing.T) {
 	testString := "Testing42"
 	log.Error(testString)
 
-	buf, _ := ioutil.ReadAll(f)
+	buf, _ := io.ReadAll(f)
 	if !strings.Contains(string(buf), testString) {
 		t.Fatalf("The log doesn't contain the string %s", testString)
 	}
