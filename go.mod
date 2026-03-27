@@ -8,7 +8,6 @@ require (
 	github.com/howeyc/gopass v0.0.0-20190910152052-7cb4b85ec19c
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7
 	github.com/oschwald/maxminddb-golang v1.5.0
-	github.com/pkg/errors v0.8.1
 	github.com/rafaeljusto/redigomock v0.0.0-20190202135759-257e089e14a1
 	github.com/youtube/vitess v0.0.0-20181105031612-54855ec7b369
 	golang.org/x/net v0.0.0-20190912160710-24e19bdeb0f2
