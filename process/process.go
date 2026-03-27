@@ -6,7 +6,6 @@ package process
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net"
 	"os"
 	"os/exec"
@@ -170,7 +169,7 @@ func WritePidFile() {
 
 	// Get our own PID and write it
 	pid := strconv.Itoa(os.Getpid())
-	if err := ioutil.WriteFile(p, []byte(pid), 0644); err != nil {
+	if err := os.WriteFile(p, []byte(pid), 0644); err != nil {
 		log.Errorf("Unable to write pid file: %v", err)
 	}
 }
@@ -191,7 +190,7 @@ func RemovePidFile() {
 
 // GetRemoteProcPid gets the pid as it appears in the pid file (maybe not ours)
 func GetRemoteProcPid() int {
-	b, err := ioutil.ReadFile(GetPidLocation())
+	b, err := os.ReadFile(GetPidLocation())
 	if err != nil {
 		return -1
 	}
