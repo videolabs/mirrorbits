@@ -5,7 +5,6 @@ package http
 
 import (
 	"fmt"
-	"os"
 	"testing"
 	"time"
 
@@ -24,7 +23,7 @@ func TestMain(m *testing.M) {
 	SetConfiguration(&Configuration{
 		FixTimezoneOffsets: false,
 	})
-	os.Exit(m.Run())
+	m.Run()
 }
 
 // Helper to check the results of the Filter function on a single mirror
