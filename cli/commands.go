@@ -7,6 +7,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -29,7 +30,6 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/howeyc/gopass"
 	"github.com/op/go-logging"
-	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -1198,7 +1198,7 @@ func (c *cli) CmdVersion(args ...string) error {
 	reply, err := client.GetVersion(ctx, &empty.Empty{})
 	if err != nil {
 		s := status.Convert(err)
-		return errors.Wrap(s.Err(), "version error")
+		return fmt.Errorf("version error: %w", s.Err())
 	}
 
 	if reply.Version != "" {
