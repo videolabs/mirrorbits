@@ -5,7 +5,6 @@ package config
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sync"
@@ -141,7 +140,7 @@ func ReloadConfig() error {
 		}
 	}
 
-	content, err := ioutil.ReadFile(core.ConfigFile)
+	content, err := os.ReadFile(core.ConfigFile)
 	if err != nil {
 		fmt.Println("Configuration could not be found.\n\tUse -config <path>")
 		os.Exit(1)

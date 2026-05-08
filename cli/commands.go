@@ -9,7 +9,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"net/url"
 	"os"
 	"os/exec"
@@ -683,7 +682,7 @@ reopen:
 	}
 
 	// Read the file back
-	out, err = ioutil.ReadFile(f.Name())
+	out, err = os.ReadFile(f.Name())
 	if err != nil {
 		log.Fatal("Cannot read file", f.Name())
 	}
