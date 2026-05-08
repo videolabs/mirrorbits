@@ -64,11 +64,11 @@ func (e *NotReadyError) Err() error {
 	return NewNetTemporaryError()
 }
 
-func (e *NotReadyError) Do(commandName string, args ...interface{}) (reply interface{}, err error) {
+func (e *NotReadyError) Do(commandName string, args ...any) (reply any, err error) {
 	return nil, NewNetTemporaryError()
 }
 
-func (e *NotReadyError) Send(commandName string, args ...interface{}) error {
+func (e *NotReadyError) Send(commandName string, args ...any) error {
 	return NewNetTemporaryError()
 }
 
@@ -76,6 +76,6 @@ func (e *NotReadyError) Flush() error {
 	return NewNetTemporaryError()
 }
 
-func (e *NotReadyError) Receive() (reply interface{}, err error) {
+func (e *NotReadyError) Receive() (reply any, err error) {
 	return nil, NewNetTemporaryError()
 }

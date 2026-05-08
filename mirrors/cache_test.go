@@ -109,7 +109,7 @@ func TestCache_fetchFileInfo(t *testing.T) {
 		t.Fatalf("Error expected, mock command not yet registered")
 	}
 
-	cmdGetFileinfo := mock.Command("HMGET", "FILE_"+testfile.Path, "size", "modTime", "sha1", "sha256", "md5").Expect([]interface{}{
+	cmdGetFileinfo := mock.Command("HMGET", "FILE_"+testfile.Path, "size", "modTime", "sha1", "sha256", "md5").Expect([]any{
 		[]byte(strconv.FormatInt(testfile.Size, 10)),
 		[]byte(testfile.ModTime.Format("2006-01-02 15:04:05.999999999 -0700 MST")),
 		[]byte(testfile.Sha1),
@@ -154,7 +154,7 @@ func TestCache_fetchFileInfo_non_existing(t *testing.T) {
 		t.Fatalf("Error expected, mock command not yet registered")
 	}
 
-	cmdGetFileinfo := mock.Command("HMGET", "FILE_"+testfile.Path, "size", "modTime", "sha1", "sha256", "md5").Expect([]interface{}{
+	cmdGetFileinfo := mock.Command("HMGET", "FILE_"+testfile.Path, "size", "modTime", "sha1", "sha256", "md5").Expect([]any{
 		[]byte(""),
 		[]byte(""),
 		[]byte(""),
@@ -201,7 +201,7 @@ func TestCache_GetFileInfo(t *testing.T) {
 		t.Fatalf("Error expected, mock command not yet registered")
 	}
 
-	cmdGetFileinfo := mock.Command("HMGET", "FILE_"+testfile.Path, "size", "modTime", "sha1", "sha256", "md5").Expect([]interface{}{
+	cmdGetFileinfo := mock.Command("HMGET", "FILE_"+testfile.Path, "size", "modTime", "sha1", "sha256", "md5").Expect([]any{
 		[]byte(strconv.FormatInt(testfile.Size, 10)),
 		[]byte(testfile.ModTime.Format("2006-01-02 15:04:05.999999999 -0700 MST")),
 		[]byte(testfile.Sha1),
@@ -251,7 +251,7 @@ func TestCache_GetFileInfo_non_existing(t *testing.T) {
 		t.Fatalf("Error expected, mock command not yet registered")
 	}
 
-	cmdGetFileinfo := mock.Command("HMGET", "FILE_"+testfile.Path, "size", "modTime", "sha1", "sha256", "md5").Expect([]interface{}{
+	cmdGetFileinfo := mock.Command("HMGET", "FILE_"+testfile.Path, "size", "modTime", "sha1", "sha256", "md5").Expect([]any{
 		[]byte(""),
 		[]byte(""),
 		[]byte(""),
@@ -295,7 +295,7 @@ func TestCache_fetchFileMirrors(t *testing.T) {
 		t.Fatalf("Error expected, mock command not yet registered")
 	}
 
-	cmdGetFilemirrors := mock.Command("SMEMBERS", "FILEMIRRORS_"+filename).Expect([]interface{}{
+	cmdGetFilemirrors := mock.Command("SMEMBERS", "FILEMIRRORS_"+filename).Expect([]any{
 		[]byte("9"),
 		[]byte("2"),
 		[]byte("5"),
@@ -427,7 +427,7 @@ func TestCache_fetchFileInfoMirror(t *testing.T) {
 		t.Fatalf("Error expected, mock command not yet registered")
 	}
 
-	cmdGetFileinfomirror := mock.Command("HMGET", "FILEINFO_1_"+testfile.Path, "size", "modTime", "sha1", "sha256", "md5").Expect([]interface{}{
+	cmdGetFileinfomirror := mock.Command("HMGET", "FILEINFO_1_"+testfile.Path, "size", "modTime", "sha1", "sha256", "md5").Expect([]any{
 		[]byte(strconv.FormatInt(testfile.Size, 10)),
 		[]byte(testfile.ModTime.String()),
 		[]byte(testfile.Sha1),
@@ -507,7 +507,7 @@ func TestCache_GetMirrors(t *testing.T) {
 		t.Fatalf("Error expected, mock command not yet registered")
 	}
 
-	cmdGetFilemirrors := mock.Command("SMEMBERS", "FILEMIRRORS_"+filename).Expect([]interface{}{
+	cmdGetFilemirrors := mock.Command("SMEMBERS", "FILEMIRRORS_"+filename).Expect([]any{
 		[]byte("1"),
 		[]byte("2"),
 	})
@@ -524,7 +524,7 @@ func TestCache_GetMirrors(t *testing.T) {
 		"longitude": "0.1275",
 	})
 
-	cmdGetFileinfomirrorM1 := mock.Command("HMGET", "FILEINFO_1_"+filename, "size", "modTime", "sha1", "sha256", "md5").Expect([]interface{}{
+	cmdGetFileinfomirrorM1 := mock.Command("HMGET", "FILEINFO_1_"+filename, "size", "modTime", "sha1", "sha256", "md5").Expect([]any{
 		[]byte("44000"),
 		[]byte(""),
 		[]byte(""),
@@ -532,7 +532,7 @@ func TestCache_GetMirrors(t *testing.T) {
 		[]byte(""),
 	})
 
-	cmdGetFileinfomirrorM2 := mock.Command("HMGET", "FILEINFO_2_"+filename, "size", "modTime", "sha1", "sha256", "md5").Expect([]interface{}{
+	cmdGetFileinfomirrorM2 := mock.Command("HMGET", "FILEINFO_2_"+filename, "size", "modTime", "sha1", "sha256", "md5").Expect([]any{
 		[]byte("44000"),
 		[]byte(""),
 		[]byte(""),

@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func StreamInterceptor(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+func StreamInterceptor(srv any, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 	if err := authorize(stream.Context()); err != nil {
 		return err
 	}
@@ -21,7 +21,7 @@ func StreamInterceptor(srv interface{}, stream grpc.ServerStream, info *grpc.Str
 	return handler(srv, stream)
 }
 
-func UnaryInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+func UnaryInterceptor(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 	if err := authorize(ctx); err != nil {
 		return nil, err
 	}

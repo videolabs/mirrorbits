@@ -186,11 +186,11 @@ func (c *CLI) List(ctx context.Context, in *empty.Empty) (*MirrorListReply, erro
 
 	for _, e := range res {
 		var mirror mirrors.Mirror
-		res, ok := e.([]interface{})
+		res, ok := e.([]any)
 		if !ok {
 			return nil, errors.New("typecast failed")
 		}
-		err = redis.ScanStruct([]interface{}(res), &mirror)
+		err = redis.ScanStruct([]any(res), &mirror)
 		if err != nil {
 			return nil, errors.Wrap(err, "scan struct failed")
 		}
@@ -719,11 +719,11 @@ func (c *CLI) StatsFile(ctx context.Context, in *StatsFileRequest) (*StatsFileRe
 	}
 
 	for _, res := range stats {
-		line, ok := res.([]interface{})
+		line, ok := res.([]any)
 		if !ok {
 			return nil, errors.Wrap(err, "typecast failed")
 		} else {
-			stats := []interface{}(line)
+			stats := []any(line)
 			for i := 0; i < len(stats); i += 2 {
 				path, _ := redis.String(stats[i], nil)
 				matched := re.MatchString(path)

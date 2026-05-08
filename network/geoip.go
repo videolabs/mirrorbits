@@ -51,7 +51,7 @@ type GeoIPRecord struct {
 
 // Geolocalizer is an interface representing a GeoIP library
 type Geolocalizer interface {
-	Lookup(ipAddress net.IP, result interface{}) error
+	Lookup(ipAddress net.IP, result any) error
 }
 
 // NewGeoIP instanciates a new instance of GeoIP

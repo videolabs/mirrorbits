@@ -155,7 +155,7 @@ func Scan(typ core.ScannerType, r *database.Redis, c *mirrors.Cache, url string,
 	s.ScannerCommit()
 
 	// Get the list of files no more present on this mirror
-	var toremove []interface{}
+	var toremove []any
 	toremove, err = redis.Values(conn.Do("SDIFF", filesKey, s.filesTmpKey))
 	if err != nil {
 		return nil, err

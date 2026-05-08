@@ -312,7 +312,7 @@ func (r *Redis) selectDB(c redis.Conn) (err error) {
 	return
 }
 
-func (r *Redis) logError(format string, args ...interface{}) {
+func (r *Redis) logError(format string, args ...any) {
 	if r.Failure() {
 		log.Debugf(format, args...)
 	} else {
@@ -424,7 +424,7 @@ func parseVersion(version string) int64 {
 	return result
 }
 
-func parseInfo(i interface{}, err error) (map[string]string, error) {
+func parseInfo(i any, err error) (map[string]string, error) {
 	v, err := redis.String(i, err)
 	if err != nil {
 		return nil, err
