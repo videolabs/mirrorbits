@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        go-version: [1.15, 1.19, 1.22]
+        go-version: [1.18, 1.24, 'stable']
 
     steps:
     - name: Check out code
