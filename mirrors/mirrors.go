@@ -261,7 +261,7 @@ func SetMirrorState(r *database.Redis, id int, proto Protocol, state bool, reaso
 		return err
 	}
 
-	var args []interface{}
+	var args []any
 	args = append(args, key, upField, state, reasonField, reason)
 
 	if state != previousState {
@@ -310,7 +310,7 @@ func (r *Redirects) Allowed() bool {
 }
 
 // MarshalYAML converts internal values to YAML
-func (r Redirects) MarshalYAML() (interface{}, error) {
+func (r Redirects) MarshalYAML() (any, error) {
 	var b *bool
 	switch r {
 	case 1:
@@ -325,7 +325,7 @@ func (r Redirects) MarshalYAML() (interface{}, error) {
 }
 
 // UnmarshalYAML converts YAML to internal values
-func (r *Redirects) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (r *Redirects) UnmarshalYAML(unmarshal func(any) error) error {
 	var b *bool
 	if err := unmarshal(&b); err != nil {
 		return err
@@ -348,12 +348,12 @@ type Time struct {
 }
 
 // RedisArg serialize the time.Time object
-func (t Time) RedisArg() interface{} {
+func (t Time) RedisArg() any {
 	return t.UTC().Unix()
 }
 
 // RedisScan deserialize the time.Time object
-func (t *Time) RedisScan(src interface{}) (err error) {
+func (t *Time) RedisScan(src any) (err error) {
 	switch src := src.(type) {
 	case int64:
 		t.Time = time.Unix(src, 0)

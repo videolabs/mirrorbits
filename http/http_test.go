@@ -171,14 +171,14 @@ func redisIsLoadingError() error {
 // A pair consisting of a redis command, and its expected result
 type mockedCmd struct {
 	Cmd []string
-	Res interface{}
+	Res any
 }
 
 // Register a list of mocked redis commands
 func mockCommands(mock *redigomock.Conn, commands []mockedCmd) {
 	for _, item := range commands {
 		// Craft arguments for mock.Command, then mock
-		args := []interface{}{}
+		args := []any{}
 		for _, arg := range item.Cmd[1:] {
 			args = append(args, arg)
 		}

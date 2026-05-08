@@ -304,7 +304,7 @@ func ReadLogs(r *database.Redis, mirrorid, max int) ([]string, error) {
 	outputs := make([]string, 0, len(lines))
 
 	for _, line := range lines {
-		var objmap map[string]interface{}
+		var objmap map[string]any
 		err = json.Unmarshal([]byte(line), &objmap)
 		if err != nil {
 			log.Warningf("Unable to parse mirror log line: %s", err)

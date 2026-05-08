@@ -126,7 +126,7 @@ func ElapsedSec(lastTimestamp int64, elapsedTime int64) bool {
 }
 
 // Plural returns a single 's' if there are more than one value
-func Plural(value interface{}) string {
+func Plural(value any) string {
 	n, ok := value.(int)
 	if ok && n > 1 || n < -1 {
 		return "s"
