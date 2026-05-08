@@ -5,7 +5,6 @@ package daemon
 
 import (
 	"fmt"
-	"os"
 	"reflect"
 	"sort"
 	"testing"
@@ -21,7 +20,7 @@ func TestMain(m *testing.M) {
 	SetConfiguration(&Configuration{
 		RedisDB: 42,
 	})
-	os.Exit(m.Run())
+	m.Run()
 }
 
 func TestStart(t *testing.T) {
