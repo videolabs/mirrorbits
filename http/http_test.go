@@ -5,7 +5,6 @@ package http
 
 import (
 	"errors"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -233,22 +232,13 @@ type testContext struct {
 }
 
 // Prepare a test, return the context
-func prepareTest(filenames []string) (testContext, error) {
+func prepareTest(t *testing.T, filenames []string) (testContext, error) {
 	// Create a temporary directory for test data
-	testDir, err := ioutil.TempDir("", "mirrorbits-tests")
-	if err != nil {
-		return testContext{}, err
-	}
-
-	defer func() {
-		if err != nil {
-			os.RemoveAll(testDir)
-		}
-	}()
+	testDir := t.TempDir()
 
 	// Create the repo directory, along with dummy files
 	repoDir := testDir + "/repo"
-	err = os.Mkdir(repoDir, 0755)
+	err := os.Mkdir(repoDir, 0755)
 	if err != nil {
 		return testContext{}, err
 	}
@@ -310,13 +300,6 @@ func prepareTest(filenames []string) (testContext, error) {
 	}, nil
 }
 
-// Cleanup after a test is done
-func cleanupTest(ctx testContext) {
-	if ctx.TestDir != "" {
-		os.RemoveAll(ctx.TestDir)
-	}
-}
-
 // Test 4xx return codes from MirrorHandler.
 //
 // Those HTTP codes are triggered when the file requested doesn't even exist in
@@ -324,11 +307,10 @@ func cleanupTest(ctx testContext) {
 // there's no need to mock redis commands.
 func TestMirrorHandler4xx(t *testing.T) {
 	// Prepare
-	ctx, err := prepareTest([]string{})
+	ctx, err := prepareTest(t, []string{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanupTest(ctx)
 
 	noHeader := map[string]string{}
 
@@ -460,11 +442,10 @@ var mockedCmds304 = [][]mockedCmd{
 // unexpected.
 func TestMirrorHandler3xx(t *testing.T) {
 	// Prepare
-	ctx, err := prepareTest([]string{testFile})
+	ctx, err := prepareTest(t, []string{testFile})
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer cleanupTest(ctx)
 
 	// Define tests
 	tests := map[string]struct {

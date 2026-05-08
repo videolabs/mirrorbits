@@ -7,7 +7,6 @@ import (
 	"bytes"
 	"errors"
 	"io"
-	"io/ioutil"
 	"os"
 	"reflect"
 	"strings"
@@ -144,12 +143,7 @@ func TestReloadRuntimeLogs(t *testing.T) {
 }
 
 func TestOpenLogFile(t *testing.T) {
-	path, err := ioutil.TempDir("", "mirrorbits-tests")
-	if err != nil {
-		t.Errorf("Unable to create temporary directory: %s", err.Error())
-		return
-	}
-	defer os.RemoveAll(path)
+	path := t.TempDir()
 
 	f, newfile, err := openLogFile(path + "/test1.log")
 	if err != nil {
