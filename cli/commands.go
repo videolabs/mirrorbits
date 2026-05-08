@@ -656,7 +656,7 @@ func (c *cli) CmdEdit(args ...string) error {
 	out, err := yaml.Marshal(mirror)
 
 	// Open a temporary file
-	f, err := ioutil.TempFile(os.TempDir(), "edit")
+	f, err := os.CreateTemp("", "edit")
 	if err != nil {
 		log.Fatal("Cannot create temporary file:", err)
 	}

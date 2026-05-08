@@ -62,7 +62,7 @@ func TestIsTerminal(t *testing.T) {
 		t.Fatalf("The current terminal is supposed to support colors")
 	}
 
-	f, err := ioutil.TempFile("", "mirrorbits-tests")
+	f, err := os.CreateTemp("", "mirrorbits-tests")
 	if err != nil {
 		t.Errorf("Unable to create a temporary file: %s", err.Error())
 		return
@@ -103,7 +103,7 @@ func TestReloadRuntimeLogs(t *testing.T) {
 	}
 
 	/* */
-	f, err := ioutil.TempFile("", "mirrorbits-tests")
+	f, err := os.CreateTemp("", "mirrorbits-tests")
 	if err != nil {
 		t.Errorf("Unable to create a temporary file: %s", err.Error())
 		return
