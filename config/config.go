@@ -46,6 +46,7 @@ func defaultConfig() Configuration {
 		LogDir:                 "",
 		TraceFileLocation:      "",
 		GeoipDatabasePath:      "/usr/share/GeoIP/",
+		GeographicalSort:       true,
 		ConcurrentSync:         5,
 		ScanInterval:           30,
 		CheckInterval:          1,
@@ -81,6 +82,7 @@ type Configuration struct {
 	LogDir                  string     `yaml:"LogDir"`
 	TraceFileLocation       string     `yaml:"TraceFileLocation"`
 	GeoipDatabasePath       string     `yaml:"GeoipDatabasePath"`
+	GeographicalSort        bool       `yaml:"GeographicalSort"`
 	ConcurrentSync          int        `yaml:"ConcurrentSync"`
 	ScanInterval            int        `yaml:"ScanInterval"`
 	CheckInterval           int        `yaml:"CheckInterval"`

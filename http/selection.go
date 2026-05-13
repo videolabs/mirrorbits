@@ -83,33 +83,50 @@ func (h DefaultEngine) Selection(ctx *Context, cache *mirrors.Cache, fileInfo *f
 	for i := 0; i < len(mlist); i++ {
 		m := &mlist[i]
 
-		m.ComputedScore = baseScore - int(m.Distance) + 1
+		if m.Distance > closestMirror*GetConfig().WeightDistributionRange {
+			log.Debugf("[%s] ignored: too far (%.1f; maximum: %.1f)", m.Name, m.Distance, closestMirror*GetConfig().WeightDistributionRange)
+			m.ComputedScore = 0
+			continue
+		}
 
-		if m.Distance <= closestMirror*GetConfig().WeightDistributionRange {
-			score := (float32(baseScore) - m.Distance)
-			if !network.IsPrimaryCountry(clientInfo, m.CountryFields) {
-				score /= 2
+		if GetConfig().GeographicalSort {
+			m.ComputedScore = baseScore - int(m.Distance) + 1
+
+			if m.Distance <= closestMirror*GetConfig().WeightDistributionRange {
+				score := (float32(baseScore) - m.Distance)
+				if !network.IsPrimaryCountry(clientInfo, m.CountryFields) {
+					score /= 2
+					m.ComputedScore += int(score)
+				} else if network.IsPrimaryCountry(clientInfo, m.CountryFields) {
+					m.ComputedScore += int(float32(baseScore) - (m.Distance * 5))
+				} else if network.IsAdditionalCountry(clientInfo, m.CountryFields) {
+					m.ComputedScore += int(float32(baseScore) - closestMirror)
+				}
+
+				if m.Asnum == clientInfo.ASNum {
+					m.ComputedScore += baseScore / 2
+				}
+
+				floatingScore := float64(m.ComputedScore) + (float64(m.ComputedScore) * (float64(m.Score) / 100)) + 0.5
+
+				// The minimum allowed score is 1
+				m.ComputedScore = int(math.Max(floatingScore, 1))
+
+				if m.ComputedScore > baseScore {
+					// The weight must always be > 0 to not break the randomization below
+					totalScore += m.ComputedScore - baseScore
+					weights[m.ID] = m.ComputedScore - baseScore
+				}
 			}
-			m.ComputedScore += int(score)
-		} else if network.IsPrimaryCountry(clientInfo, m.CountryFields) {
-			m.ComputedScore += int(float32(baseScore) - (m.Distance * 5))
-		} else if network.IsAdditionalCountry(clientInfo, m.CountryFields) {
-			m.ComputedScore += int(float32(baseScore) - closestMirror)
-		}
-
-		if m.Asnum == clientInfo.ASNum {
-			m.ComputedScore += baseScore / 2
-		}
-
-		floatingScore := float64(m.ComputedScore) + (float64(m.ComputedScore) * (float64(m.Score) / 100)) + 0.5
-
-		// The minimum allowed score is 1
-		m.ComputedScore = int(math.Max(floatingScore, 1))
-
-		if m.ComputedScore > baseScore {
-			// The weight must always be > 0 to not break the randomization below
-			totalScore += m.ComputedScore - baseScore
-			weights[m.ID] = m.ComputedScore - baseScore
+		} else { // GetConfig().GeographicalSort == false
+			if m.Score <= 0 {
+				m.ComputedScore = 0
+			} else {
+				totalScore += m.Score
+				m.Weight = float32(m.Score)
+				m.ComputedScore = m.Score
+				weights[m.ID] = m.Score
+			}
 		}
 	}
 
