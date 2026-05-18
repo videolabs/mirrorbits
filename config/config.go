@@ -85,6 +85,7 @@ type Configuration struct {
 	CheckInterval           int        `yaml:"CheckInterval"`
 	RepositoryScanInterval  int        `yaml:"RepositoryScanInterval"`
 	MaxLinkHeaders          int        `yaml:"MaxLinkHeaders"`
+	CheckSumHeaders         bool       `yaml:"CheckSumHeaders"`
 	FixTimezoneOffsets      bool       `yaml:"FixTimezoneOffsets"`
 	Hashes                  hashing    `yaml:"Hashes"`
 	DisallowRedirects       bool       `yaml:"DisallowRedirects"`

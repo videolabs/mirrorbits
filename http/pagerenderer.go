@@ -5,6 +5,8 @@ package http
 
 import (
 	"bytes"
+	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -88,6 +90,22 @@ func (w *RedirectRenderer) Write(ctx *Context, results *mirrors.Results) (status
 					countryCode = strings.ToLower(m.CountryFields[0])
 				}
 				ctx.ResponseWriter().Header().Add("Link", fmt.Sprintf("<%s>; rel=duplicate; pri=%d; geo=%s", m.AbsoluteURL+path, i+1, countryCode))
+			}
+		}
+
+		// Generate checksum headers
+		if GetConfig().CheckSumHeaders {
+			if len(results.FileInfo.Md5) > 0 {
+				md5, _ := hex.DecodeString(results.FileInfo.Md5)
+				ctx.ResponseWriter().Header().Add("Content-MD5", fmt.Sprintf("%s", base64.StdEncoding.EncodeToString(md5)))
+			}
+			if len(results.FileInfo.Sha1) > 0 {
+				sha1, _ := hex.DecodeString(results.FileInfo.Sha1)
+				ctx.ResponseWriter().Header().Add("Content-SHA1", fmt.Sprintf("%s", base64.StdEncoding.EncodeToString(sha1)))
+			}
+			if len(results.FileInfo.Sha256) > 0 {
+				sha256, _ := hex.DecodeString(results.FileInfo.Sha256)
+				ctx.ResponseWriter().Header().Add("Content-SHA256", fmt.Sprintf("%s", base64.StdEncoding.EncodeToString(sha256)))
 			}
 		}
 
