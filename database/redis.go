@@ -386,7 +386,7 @@ again:
 			time.Sleep(100 * time.Millisecond)
 			goto again
 		} else if err != nil {
-			log.Fatalf("Upgrade failed: %+v", err)
+			log.Fatalf("Upgrade failed: %v", err)
 		}
 		log.Infof("Database upgrade successful (took %s), starting normally", time.Since(t).Round(time.Millisecond))
 	}

@@ -278,7 +278,7 @@ func (c *CLI) GeoUpdateMirror(ctx context.Context, in *MirrorIDRequest) (*GeoUpd
 
 	geo := network.NewGeoIP()
 	if err := geo.LoadGeoIP(); err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	geoRec := geo.GetRecord(ip)
@@ -346,7 +346,7 @@ func (c *CLI) AddMirror(ctx context.Context, in *Mirror) (*AddMirrorReply, error
 
 	geo := network.NewGeoIP()
 	if err := geo.LoadGeoIP(); err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	geoRec := geo.GetRecord(ip)
