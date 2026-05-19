@@ -5,6 +5,7 @@ package daemon
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math/rand"
 	"net"
@@ -22,7 +23,6 @@ import (
 	"github.com/etix/mirrorbits/utils"
 	"github.com/gomodule/redigo/redis"
 	"github.com/op/go-logging"
-	"github.com/pkg/errors"
 )
 
 var (
@@ -170,7 +170,7 @@ func (m *monitor) MonitorLoop() {
 		err := m.scanRepository()
 		if err != nil {
 			if i == 0 {
-				log.Errorf("%+v", errors.Wrap(err, "unable to scan the local repository"))
+				log.Errorf("%+v", fmt.Errorf("unable to scan the local repository: %w", err))
 			}
 			return err
 		}
@@ -182,14 +182,14 @@ func (m *monitor) MonitorLoop() {
 		ids, err := m.mirrorsID()
 		if err != nil {
 			if i == 0 {
-				log.Errorf("%+v", errors.Wrap(err, "unable to retrieve the mirror list"))
+				log.Errorf("%+v", fmt.Errorf("unable to retrieve the mirror list: %w", err))
 			}
 			return err
 		}
 		err = m.syncMirrorList(ids...)
 		if err != nil {
 			if i == 0 {
-				log.Errorf("%+v", errors.Wrap(err, "unable to sync the list of mirrors"))
+				log.Errorf("%+v", fmt.Errorf("unable to sync the list of mirrors: %w", err))
 			}
 			return err
 		}

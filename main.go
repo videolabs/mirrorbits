@@ -23,7 +23,6 @@ import (
 	"github.com/etix/mirrorbits/process"
 	"github.com/etix/mirrorbits/rpc"
 	"github.com/op/go-logging"
-	"github.com/pkg/errors"
 )
 
 var (
@@ -55,7 +54,7 @@ func main() {
 		/* Setup RPC */
 		rpcs := new(rpc.CLI)
 		if err := rpcs.Start(); err != nil {
-			log.Fatal(errors.Wrap(err, "rpc error"))
+			log.Fatal(fmt.Errorf("rpc error: %w", err))
 		}
 
 		/* Connect to the database */

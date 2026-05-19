@@ -4,6 +4,7 @@
 package rpc
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -26,7 +27,6 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/gomodule/redigo/redis"
-	"github.com/pkg/errors"
 	context "golang.org/x/net/context"
 	grpc "google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -126,7 +126,7 @@ func (c *CLI) MatchMirror(ctx context.Context, in *MatchRequest) (*MatchReply, e
 
 	mirrors, err := c.redis.GetListOfMirrors()
 	if err != nil {
-		return nil, errors.Wrap(err, "can't fetch the list of mirrors")
+		return nil, fmt.Errorf("can't fetch the list of mirrors: %w", err)
 	}
 
 	reply := &MatchReply{}
@@ -169,7 +169,7 @@ func (c *CLI) List(ctx context.Context, in *empty.Empty) (*MirrorListReply, erro
 
 	mirrorsIDs, err := c.redis.GetListOfMirrors()
 	if err != nil {
-		return nil, errors.Wrap(err, "can't fetch the list of mirrors")
+		return nil, fmt.Errorf("can't fetch the list of mirrors: %w", err)
 	}
 
 	conn.Send("MULTI")
@@ -179,7 +179,7 @@ func (c *CLI) List(ctx context.Context, in *empty.Empty) (*MirrorListReply, erro
 
 	res, err := redis.Values(conn.Do("EXEC"))
 	if err != nil {
-		return nil, errors.Wrap(err, "database error")
+		return nil, fmt.Errorf("database error: %w", err)
 	}
 
 	reply := &MirrorListReply{}
@@ -192,7 +192,7 @@ func (c *CLI) List(ctx context.Context, in *empty.Empty) (*MirrorListReply, erro
 		}
 		err = redis.ScanStruct([]any(res), &mirror)
 		if err != nil {
-			return nil, errors.Wrap(err, "scan struct failed")
+			return nil, fmt.Errorf("scan struct failed: %w", err)
 		}
 		m, err := MirrorToRPC(&mirror)
 		if err != nil {
@@ -263,7 +263,7 @@ func (c *CLI) GeoUpdateMirror(ctx context.Context, in *MirrorIDRequest) (*GeoUpd
 		u, err = url.Parse("http://" + mirror.HttpURL)
 	}
 	if err != nil {
-		return nil, errors.Wrap(err, "can't parse http url")
+		return nil, fmt.Errorf("can't parse http url: %w", err)
 	}
 
 	reply := &GeoUpdateMirrorReply{}
@@ -273,7 +273,7 @@ func (c *CLI) GeoUpdateMirror(ctx context.Context, in *MirrorIDRequest) (*GeoUpd
 		reply.Warnings = append(reply.Warnings,
 			"Warning: the hostname returned more than one address. Assuming they're sharing the same location.")
 	} else if err != nil {
-		return nil, errors.Wrap(err, "IP lookup failed")
+		return nil, fmt.Errorf("IP lookup failed: %w", err)
 	}
 
 	geo := network.NewGeoIP()
@@ -331,7 +331,7 @@ func (c *CLI) AddMirror(ctx context.Context, in *Mirror) (*AddMirrorReply, error
 		u, err = url.Parse("http://" + mirror.HttpURL)
 	}
 	if err != nil {
-		return nil, errors.Wrap(err, "can't parse http url")
+		return nil, fmt.Errorf("can't parse http url: %w", err)
 	}
 
 	reply := &AddMirrorReply{}
@@ -341,7 +341,7 @@ func (c *CLI) AddMirror(ctx context.Context, in *Mirror) (*AddMirrorReply, error
 		reply.Warnings = append(reply.Warnings,
 			"Warning: the hostname returned more than one address. Assuming they're sharing the same location.")
 	} else if err != nil {
-		return nil, errors.Wrap(err, "IP lookup failed")
+		return nil, fmt.Errorf("IP lookup failed: %w", err)
 	}
 
 	geo := network.NewGeoIP()
@@ -429,7 +429,7 @@ func (c *CLI) setMirror(mirror *mirrors.Mirror) error {
 
 	mirrorsIDs, err := c.redis.GetListOfMirrors()
 	if err != nil {
-		return errors.Wrap(err, "can't fetch the list of mirrors")
+		return fmt.Errorf("can't fetch the list of mirrors: %w", err)
 	}
 
 	isUpdate := false
@@ -447,7 +447,7 @@ func (c *CLI) setMirror(mirror *mirrors.Mirror) error {
 		// Generate a new ID
 		mirror.ID, err = redis.Int(conn.Do("INCR", "LAST_MID"))
 		if err != nil {
-			return errors.Wrap(err, "failed creating a new id")
+			return fmt.Errorf("failed creating a new id: %w", err)
 		}
 	}
 
@@ -505,7 +505,7 @@ func (c *CLI) setMirror(mirror *mirrors.Mirror) error {
 
 	_, err = conn.Do("EXEC")
 	if err != nil {
-		return errors.Wrap(err, "couldn't save the mirror configuration")
+		return fmt.Errorf("couldn't save the mirror configuration: %w", err)
 	}
 
 	// Publish update
@@ -536,13 +536,13 @@ func (c *CLI) RemoveMirror(ctx context.Context, in *MirrorIDRequest) (*empty.Emp
 	// First disable the mirror
 	err = mirrors.DisableMirror(c.redis, int(in.ID))
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to disable the mirror")
+		return nil, fmt.Errorf("unable to disable the mirror: %w", err)
 	}
 
 	// Get all files supported by the given mirror
 	files, err := redis.Strings(conn.Do("SMEMBERS", fmt.Sprintf("MIRRORFILES_%d", in.ID)))
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to fetch the file list")
+		return nil, fmt.Errorf("unable to fetch the file list: %w", err)
 	}
 
 	conn.Send("MULTI")
@@ -568,7 +568,7 @@ func (c *CLI) RemoveMirror(ctx context.Context, in *MirrorIDRequest) (*empty.Emp
 
 	_, err = conn.Do("EXEC")
 	if err != nil {
-		return nil, errors.Wrap(err, "operation failed")
+		return nil, fmt.Errorf("operation failed: %w", err)
 	}
 
 	// Publish update
@@ -666,7 +666,7 @@ func (c *CLI) ScanMirror(ctx context.Context, in *ScanMirrorRequest) (*ScanMirro
 	// Finally enable the mirror if requested
 	if err == nil && in.AutoEnable == true {
 		if err := mirrors.EnableMirror(c.redis, mirror.ID); err != nil {
-			return nil, errors.Wrap(err, "couldn't enable the mirror")
+			return nil, fmt.Errorf("couldn't enable the mirror: %w", err)
 		}
 		reply.Enabled = true
 	}
@@ -711,7 +711,7 @@ func (c *CLI) StatsFile(ctx context.Context, in *StatsFileRequest) (*StatsFileRe
 
 	stats, err := redis.Values(conn.Do("EXEC"))
 	if err != nil {
-		return nil, errors.Wrap(err, "can't fetch stats")
+		return nil, fmt.Errorf("can't fetch stats: %w", err)
 	}
 
 	reply := &StatsFileReply{
@@ -721,7 +721,7 @@ func (c *CLI) StatsFile(ctx context.Context, in *StatsFileRequest) (*StatsFileRe
 	for _, res := range stats {
 		line, ok := res.([]any)
 		if !ok {
-			return nil, errors.Wrap(err, "typecast failed")
+			return nil, fmt.Errorf("typecast failed: %w", err)
 		} else {
 			stats := []any(line)
 			for i := 0; i < len(stats); i += 2 {
@@ -772,13 +772,13 @@ func (c *CLI) StatsMirror(ctx context.Context, in *StatsMirrorRequest) (*StatsMi
 
 	stats, err := redis.Strings(conn.Do("EXEC"))
 	if err != nil {
-		return nil, errors.Wrap(err, "can't fetch stats")
+		return nil, fmt.Errorf("can't fetch stats: %w", err)
 	}
 
 	// Fetch the mirror struct
 	m, err := redis.Values(conn.Do("HGETALL", fmt.Sprintf("MIRROR_%d", in.ID)))
 	if err != nil {
-		return nil, errors.WithMessage(err, "can't fetch mirror")
+		return nil, fmt.Errorf("can't fetch mirror: %w", err)
 	}
 
 	reply := &StatsMirrorReply{}
@@ -786,12 +786,12 @@ func (c *CLI) StatsMirror(ctx context.Context, in *StatsMirrorRequest) (*StatsMi
 	var mirror mirrors.Mirror
 	err = redis.ScanStruct(m, &mirror)
 	if err != nil {
-		return nil, errors.Wrap(err, "stats error")
+		return nil, fmt.Errorf("stats error: %w", err)
 	}
 
 	reply.Mirror, err = MirrorToRPC(&mirror)
 	if err != nil {
-		return nil, errors.Wrap(err, "stats error")
+		return nil, fmt.Errorf("stats error: %w", err)
 	}
 
 	for i := 0; i < len(stats); i += 2 {
@@ -811,7 +811,7 @@ func (c *CLI) GetMirrorLogs(ctx context.Context, in *GetMirrorLogsRequest) (*Get
 
 	lines, err := mirrors.ReadLogs(c.redis, int(in.ID), int(in.MaxResults))
 	if err != nil {
-		return nil, errors.Wrap(err, "mirror logs error")
+		return nil, fmt.Errorf("mirror logs error: %w", err)
 	}
 
 	return &GetMirrorLogsReply{Line: lines}, nil
