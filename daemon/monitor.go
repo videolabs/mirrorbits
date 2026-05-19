@@ -5,6 +5,7 @@ package daemon
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math/rand"
 	"net"
@@ -22,7 +23,6 @@ import (
 	"github.com/etix/mirrorbits/utils"
 	"github.com/gomodule/redigo/redis"
 	"github.com/op/go-logging"
-	"github.com/pkg/errors"
 )
 
 var (
@@ -170,7 +170,7 @@ func (m *monitor) MonitorLoop() {
 		err := m.scanRepository()
 		if err != nil {
 			if i == 0 {
-				log.Errorf("%+v", errors.Wrap(err, "unable to scan the local repository"))
+				log.Errorf("%+v", fmt.Errorf("unable to scan the local repository: %w", err))
 			}
 			return err
 		}
@@ -182,14 +182,14 @@ func (m *monitor) MonitorLoop() {
 		ids, err := m.mirrorsID()
 		if err != nil {
 			if i == 0 {
-				log.Errorf("%+v", errors.Wrap(err, "unable to retrieve the mirror list"))
+				log.Errorf("%+v", fmt.Errorf("unable to retrieve the mirror list: %w", err))
 			}
 			return err
 		}
 		err = m.syncMirrorList(ids...)
 		if err != nil {
 			if i == 0 {
-				log.Errorf("%+v", errors.Wrap(err, "unable to sync the list of mirrors"))
+				log.Errorf("%+v", fmt.Errorf("unable to sync the list of mirrors: %w", err))
 			}
 			return err
 		}
@@ -433,7 +433,8 @@ func (m *monitor) syncLoop() {
 			go func() {
 				err := m.trace.GetLastUpdate(mir.Mirror)
 				if err != nil && err != scan.ErrNoTrace {
-					if numError, ok := err.(*strconv.NumError); ok {
+					var numError *strconv.NumError
+					if errors.As(err, &numError) {
 						if numError.Err == strconv.ErrSyntax {
 							log.Warningf("[%s] parsing trace file failed: %s is not a valid timestamp", mir.Name, strconv.Quote(numError.Num))
 							return
@@ -550,7 +551,8 @@ func (m *monitor) healthCheckDo(mirror *mirrors.Mirror, url string, file string,
 	}
 
 	if err != nil {
-		if opErr, ok := err.(*net.OpError); ok {
+		var opErr *net.OpError
+		if errors.As(err, &opErr) {
 			log.Debugf("Op: %s | Net: %s | Addr: %s | Err: %s | Temporary: %t", opErr.Op, opErr.Net, opErr.Addr, opErr.Error(), opErr.Temporary())
 		}
 		reason := "Unreachable"

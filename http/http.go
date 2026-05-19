@@ -7,6 +7,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"html/template"
 	"math/rand"
@@ -77,7 +78,8 @@ func HTTPServer(redis *database.Redis, cache *mirrors.Cache) *HTTP {
 
 	// Load the GeoIP databases
 	if err := h.geoip.LoadGeoIP(); err != nil {
-		if gerr, ok := err.(network.GeoIPError); ok {
+		var gerr network.GeoIPError
+		if errors.As(err, &gerr) {
 			for _, e := range gerr.Errors {
 				log.Critical(e.Error())
 			}
@@ -264,7 +266,8 @@ func (h *HTTP) mirrorHandler(w http.ResponseWriter, r *http.Request, ctx *Contex
 
 	/* Handle errors */
 	fallback := false
-	if _, ok := err.(net.Error); ok || len(mlist) == 0 {
+	var netErr net.Error
+	if errors.As(err, &netErr) || len(mlist) == 0 {
 		/* Handle fallbacks */
 		fallbacks := GetConfig().Fallbacks
 		if len(fallbacks) > 0 {
@@ -402,7 +405,8 @@ func (h *HTTP) LoadTemplates(name string) (t *template.Template, err error) {
 		filepath.Clean(GetConfig().Templates+"/base.html"),
 		filepath.Clean(fmt.Sprintf("%s/%s.html", GetConfig().Templates, name)))
 	if err != nil {
-		if e, ok := err.(*os.PathError); ok {
+		var e *os.PathError
+		if errors.As(err, &e) {
 			log.Fatalf(fmt.Sprintf("Cannot load template %s: %s", e.Path, e.Err.Error()))
 		} else {
 			log.Fatal(err.Error())
