@@ -621,7 +621,8 @@ func (c *CLI) ScanMirror(ctx context.Context, in *ScanMirrorRequest) (*ScanMirro
 		defer wg.Done()
 		err := trace.GetLastUpdate(mirror)
 		if err != nil && err != scan.ErrNoTrace {
-			if numError, ok := err.(*strconv.NumError); ok {
+			var numError *strconv.NumError
+			if errors.As(err, &numError) {
 				if numError.Err == strconv.ErrSyntax {
 					//log.Warningf("[%s] parsing trace file failed: %s is not a valid timestamp", mirror.Name, strconv.Quote(numError.Num))
 					return
