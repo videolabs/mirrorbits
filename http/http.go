@@ -210,6 +210,8 @@ func (h *HTTP) requestDispatcher(w http.ResponseWriter, r *http.Request) {
 	switch ctx.Type() {
 	case MIRRORLIST:
 		fallthrough
+	case METALINK:
+		fallthrough
 	case STANDARD:
 		h.mirrorHandler(w, r, ctx)
 	case MIRRORSTATS:
@@ -318,6 +320,8 @@ func (h *HTTP) mirrorHandler(w http.ResponseWriter, r *http.Request, ctx *Contex
 
 	if ctx.IsMirrorlist() {
 		resultRenderer = &MirrorListRenderer{}
+	} else if ctx.IsMetalink() {
+		resultRenderer = &MetalinkRenderer{}
 	} else {
 		switch GetConfig().OutputMode {
 		case "json":

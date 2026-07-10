@@ -23,6 +23,7 @@ const (
 	FILESTATS
 	MIRRORSTATS
 	CHECKSUM
+	METALINK
 
 	UNDEFINED SecureOption = iota
 	WITHTLS
@@ -40,6 +41,7 @@ type Context struct {
 	isMirrorStats bool
 	isFileStats   bool
 	isChecksum    bool
+	isMetalink    bool
 	isPretty      bool
 	secureOption  SecureOption
 }
@@ -60,6 +62,9 @@ func NewContext(w http.ResponseWriter, r *http.Request, t Templates) *Context {
 	} else if c.paramBool("md5") || c.paramBool("sha1") || c.paramBool("sha256") {
 		c.typ = CHECKSUM
 		c.isChecksum = true
+	} else if c.paramBool("meta4") || strings.Contains(strings.ToLower(r.Header.Get("Accept")), "application/metalink4+xml") {
+		c.typ = METALINK
+		c.isMetalink = true
 	} else {
 		c.typ = STANDARD
 	}
@@ -127,6 +132,11 @@ func (c *Context) IsMirrorStats() bool {
 // IsChecksum returns true if a checksum has been requested
 func (c *Context) IsChecksum() bool {
 	return c.isChecksum
+}
+
+// IsMetalink returns true if a Metalink 4 (RFC 5854) document has been requested
+func (c *Context) IsMetalink() bool {
+	return c.isMetalink
 }
 
 // IsPretty returns true if the pretty json has been requested
