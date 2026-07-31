@@ -1,3 +1,31 @@
+## master
+
+### FEATURES
+
+- New option `GeographicalSort` to disable the sorting of mirrors by distance (#225)
+- Support for rsync over TLS, using `rsyncs://` URLs (#203)
+- Show why a mirror is down in `mirrorbits list` (#221)
+
+### ENHANCEMENTS
+
+- Use IEC prefixes (KiB, MiB...) for file sizes on the web pages (#205)
+- Use a longer timeout when removing a mirror (#206)
+- Improve the scan logs (#201)
+- Update the OpenStreetMap tile server URL (#204)
+- Improve spacing in the CLI table outputs (#224)
+
+### BUGFIXES
+
+- Fix mirror name matching on the CLI when a name is a substring of another (#134)
+- Fix a bogus error forwarding in the RPC layer (#220)
+
+### Changes
+
+- Go 1.18+ is now required, and the vendor tree has been removed (#214)
+- Redis 4.0+ is now required (#223)
+- `mirrorbits list`: the header line is now uppercase (#224)
+- Replace deprecated dependencies (`io/ioutil`, `pkg/errors`, `gopass`) with the standard library (#210, #216, #217, #219)
+
 ## v0.6.1
 
 ### BUGFIXES
