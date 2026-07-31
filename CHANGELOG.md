@@ -102,7 +102,7 @@
 - Allow negative scores to reduce the weight of a mirror
 - Follow symbolic links within a repository
 - Allow/Disallow per-mirror redirects configuration
-- Display the sync offset between each mirrors and the source on the mirrorstats page (requires a trace file on the repository)
+- Display the sync offset between each mirror and the source on the mirrorstats page (requires a trace file on the repository)
 - New cli option to force a rehashing of all files during a refresh
 - Added a Dockerfile
 
@@ -187,7 +187,7 @@
 ### ENHANCEMENTS
 
 - Improve parse errors in the configuration
-- Don't log if logdir in unset
+- Don't log if logdir is unset
 
 ### BUGFIXES
 
@@ -204,7 +204,7 @@
 ### FEATURES
 
 - CLI: a parse error in the mirror configuration can now be retried
-- CLI: add supports for taking notes / comments on a mirror
+- CLI: add support for taking notes / comments on a mirror
 - CLI: add a command-line flag to auto-enable a mirror after a successful scan
 - CLI: add a flag to scan all mirrors at once
 
@@ -214,7 +214,7 @@
 
 ### BUGFIXES
 
-- Fix few corner cases in weight distribution
+- Fix a few corner cases in weight distribution
 
 ## v0.1.0
 
