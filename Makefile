@@ -25,6 +25,12 @@ export PATH := $(GOPATH)/bin:$(PATH)
 PKG_CONFIG ?= /usr/bin/pkg-config
 SERVICEDIR_SYSTEMD ?= $(shell $(PKG_CONFIG) systemd --variable=systemdsystemunitdir)
 
+# Version in line with what we have in go.mod
+PROTOC_GEN_GO_VERSION := $(shell grep -F 'google.golang.org/protobuf ' go.mod | head -1 | awk '{print $$2}')
+# Version not aligned with grpc-go versions, check the list at:
+# https://pkg.go.dev/google.golang.org/grpc/cmd/protoc-gen-go-grpc?tab=versions
+PROTOC_GEN_GO_GRPC_VERSION := v1.0.1
+
 all: build
 
 regen-proto: rpc/rpc.proto
@@ -32,9 +38,10 @@ regen-proto: rpc/rpc.proto
 		echo "error: protoc not installed" >&2; \
 		exit 1; \
 	fi
-	go install github.com/golang/protobuf/protoc-gen-go@v1.3.5 && \
-	rm -f rpc/rpc.pb.go && \
-	protoc -I rpc rpc/rpc.proto --go_out=plugins=grpc:rpc
+	go install google.golang.org/protobuf/cmd/protoc-gen-go@$(PROTOC_GEN_GO_VERSION) && \
+	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@$(PROTOC_GEN_GO_GRPC_VERSION) && \
+	rm -f rpc/rpc.pb.go rpc/rpc_grpc.pb.go && \
+	protoc --go_out=. --go-grpc_out=. ./rpc/rpc.proto
 
 build:
 	GO111MODULE=on go build $(GOFLAGS) -o $(BINARY) .

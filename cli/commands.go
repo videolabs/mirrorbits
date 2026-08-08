@@ -25,13 +25,13 @@ import (
 	"github.com/etix/mirrorbits/mirrors"
 	"github.com/etix/mirrorbits/rpc"
 	"github.com/etix/mirrorbits/utils"
-	"github.com/golang/protobuf/ptypes"
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/op/go-logging"
 	"golang.org/x/term"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"gopkg.in/yaml.v3"
 )
 
@@ -160,7 +160,7 @@ func (c *cli) CmdList(args ...string) error {
 	client := c.GetRPC()
 	ctx, cancel := context.WithTimeout(context.Background(), defaultRPCTimeout)
 	defer cancel()
-	list, err := client.List(ctx, &empty.Empty{})
+	list, err := client.List(ctx, &emptypb.Empty{})
 	if err != nil {
 		log.Fatal("list error:", err)
 	}
@@ -206,10 +206,10 @@ func (c *cli) CmdList(args ...string) error {
 				continue
 			}
 		}
-		stateSince, err := ptypes.Timestamp(mirror.StateSince)
-		if err != nil {
+		if err = mirror.StateSince.CheckValid(); err != nil {
 			log.Fatal("list error:", err)
 		}
+		stateSince := mirror.StateSince.AsTime()
 		fmt.Fprintf(w, "%s", mirror.Name)
 		if *score == true {
 			fmt.Fprintf(w, "\t%d", mirror.Score)
@@ -921,7 +921,7 @@ func (c *cli) CmdExport(args ...string) error {
 	client := c.GetRPC()
 	ctx, cancel := context.WithTimeout(context.Background(), defaultRPCTimeout)
 	defer cancel()
-	list, err := client.List(ctx, &empty.Empty{})
+	list, err := client.List(ctx, &emptypb.Empty{})
 	if err != nil {
 		log.Fatal("export error:", err)
 	}
@@ -1036,13 +1036,13 @@ func (c *cli) CmdStats(args ...string) error {
 	if err != nil {
 		start = time.Now()
 	}
-	startproto, _ := ptypes.TimestampProto(start)
+	startproto := timestamppb.New(start)
 
 	end, err := time.Parse("2006-1-2", *dateEnd)
 	if err != nil {
 		end = time.Now()
 	}
-	endproto, _ := ptypes.TimestampProto(end)
+	endproto := timestamppb.New(end)
 
 	client := c.GetRPC()
 	ctx, cancel := context.WithTimeout(context.Background(), defaultRPCTimeout)
@@ -1174,7 +1174,7 @@ func (c *cli) CmdReload(args ...string) error {
 	client := c.GetRPC()
 	ctx, cancel := context.WithTimeout(context.Background(), defaultRPCTimeout)
 	defer cancel()
-	_, err := client.Reload(ctx, &empty.Empty{})
+	_, err := client.Reload(ctx, &emptypb.Empty{})
 	if err != nil {
 		log.Fatal("reload error:", err)
 	}
@@ -1196,7 +1196,7 @@ func (c *cli) CmdUpgrade(args ...string) error {
 	client := c.GetRPC()
 	ctx, cancel := context.WithTimeout(context.Background(), defaultRPCTimeout)
 	defer cancel()
-	_, err := client.Upgrade(ctx, &empty.Empty{})
+	_, err := client.Upgrade(ctx, &emptypb.Empty{})
 	if err != nil {
 		log.Fatal("upgrade error:", err)
 	}
@@ -1222,7 +1222,7 @@ func (c *cli) CmdVersion(args ...string) error {
 	client := c.GetRPC()
 	ctx, cancel := context.WithTimeout(context.Background(), defaultRPCTimeout)
 	defer cancel()
-	reply, err := client.GetVersion(ctx, &empty.Empty{})
+	reply, err := client.GetVersion(ctx, &emptypb.Empty{})
 	if err != nil {
 		s := status.Convert(err)
 		return fmt.Errorf("version error: %w", s.Err())
