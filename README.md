@@ -36,6 +36,7 @@ Mirrorbits is a geographical download redirector written in [Go](https://golang.
 ## Is it production ready?
 
 **Yes!** Mirrorbits has served **billions** of files already and is known to be running in production at:
+* [Blender](https://www.blender.org/) since [July 2026](https://projects.blender.org/infrastructure/mirror/wiki/Technical-Details)
 * [CarbonROM](https://carbonrom.org/)
 * [Chaos Computer Club](https://media.ccc.de/) to distribute media
 * [Endless OS](https://endlessos.org/os)
