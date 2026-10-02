@@ -38,16 +38,16 @@ Mirrorbits is a geographical download redirector written in [Go](https://golang.
 **Yes!** Mirrorbits has served **billions** of files already and is known to be running in production at:
 * [CarbonROM](https://carbonrom.org/)
 * [Chaos Computer Club](https://media.ccc.de/) to distribute media
+* [Endless OS](https://endlessos.org/os)
 * [Jellyfin](https://jellyfin.org/) since [April 2021](https://jellyfin.org/posts/mirrorbits-cdn/)
 * [Jenkins](https://www.jenkins.io/) to distribute Jenkins releases since [February 2020](https://github.com/jenkins-infra/docker-mirrorbits)
 * [Kali Linux](https://www.kali.org/) to distribute packages and images since [December 2023](https://www.kali.org/blog/kali-linux-2023-4-release/#enters-mirrorbits)
 * [Kodi](http://kodi.tv/) (previously XBMC) since [July 2015](https://forum.kodi.tv/showthread.php?tid=233824)
 * [LineageOS](http://lineageos.org/) (previously CyanogenMod) since January 2017
 * [MariaDB](https://mariadb.org/) to distribute packages (deb/rpm) for Linux distributions since [December 2021](https://mariadb.org/mirrorbits/)
+* [MSYS2](https://www.msys2.org/) to distribute packages since [June 2021](https://github.com/msys2/msys2-main-server/commit/6a212b9ac76913f96)
 * [OSMC](https://osmc.tv)
 * [VideoLAN](http://www.videolan.org/) to distribute [VLC media player](http://www.videolan.org/vlc/) since [April 2014](https://blog.l0cal.com/2014/07/11/mirrorbits-is-now-on-github/)
-* [Endless OS](https://endlessos.org/os)
-* [MSYS2](https://www.msys2.org/) to distribute packages since [June 2021](https://github.com/msys2/msys2-main-server/commit/6a212b9ac76913f96)
 
 Yet some things might change before the 1.0 release. If you intend to deploy Mirrorbits in a production system it is advised to notify the author first so we can help you to make any transition as seamless as possible!
 
