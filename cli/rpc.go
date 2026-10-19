@@ -11,10 +11,10 @@ import (
 
 	"github.com/etix/mirrorbits/core"
 	"github.com/etix/mirrorbits/rpc"
-	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 func (c *cli) GetRPC() rpc.CLIClient {
@@ -33,7 +33,7 @@ func (c *cli) GetRPC() rpc.CLIClient {
 		}
 		c.rpcconn = conn
 		client := rpc.NewCLIClient(c.rpcconn)
-		_, err = client.Ping(context.Background(), &empty.Empty{})
+		_, err = client.Ping(context.Background(), &emptypb.Empty{})
 		s := status.Convert(err)
 		if s.Code() == codes.Unauthenticated {
 			if len(c.creds.Password) == 0 {

@@ -24,14 +24,13 @@ import (
 	"github.com/etix/mirrorbits/network"
 	"github.com/etix/mirrorbits/scan"
 	"github.com/etix/mirrorbits/utils"
-	"github.com/golang/protobuf/ptypes"
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/gomodule/redigo/redis"
 	context "golang.org/x/net/context"
 	grpc "google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"gopkg.in/yaml.v3"
 )
 
@@ -42,6 +41,7 @@ var (
 
 // CLI object handles the server side RPC of the CLI
 type CLI struct {
+	UnimplementedCLIServer
 	listener net.Listener
 	server   *grpc.Server
 	sig      chan<- os.Signal
@@ -86,11 +86,11 @@ func (c *CLI) SetCache(cache *mirrors.Cache) {
 	c.cache = cache
 }
 
-func (c *CLI) Ping(context.Context, *empty.Empty) (*empty.Empty, error) {
-	return &empty.Empty{}, nil
+func (c *CLI) Ping(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
+	return &emptypb.Empty{}, nil
 }
 
-func (c *CLI) GetVersion(context.Context, *empty.Empty) (*VersionReply, error) {
+func (c *CLI) GetVersion(context.Context, *emptypb.Empty) (*VersionReply, error) {
 	return &VersionReply{
 		Version:    core.VERSION,
 		Build:      core.BUILD + core.DEV,
@@ -101,22 +101,22 @@ func (c *CLI) GetVersion(context.Context, *empty.Empty) (*VersionReply, error) {
 	}, nil
 }
 
-func (c *CLI) Upgrade(ctx context.Context, in *empty.Empty) (*empty.Empty, error) {
+func (c *CLI) Upgrade(ctx context.Context, in *emptypb.Empty) (*emptypb.Empty, error) {
 	select {
 	case c.sig <- syscall.SIGUSR2:
 	default:
 		return nil, status.Error(codes.Internal, "signal handler not ready")
 	}
-	return &empty.Empty{}, nil
+	return &emptypb.Empty{}, nil
 }
 
-func (c *CLI) Reload(ctx context.Context, in *empty.Empty) (*empty.Empty, error) {
+func (c *CLI) Reload(ctx context.Context, in *emptypb.Empty) (*emptypb.Empty, error) {
 	select {
 	case c.sig <- syscall.SIGHUP:
 	default:
 		return nil, status.Error(codes.Internal, "signal handler not ready")
 	}
-	return &empty.Empty{}, nil
+	return &emptypb.Empty{}, nil
 }
 
 func (c *CLI) MatchMirror(ctx context.Context, in *MatchRequest) (*MatchReply, error) {
@@ -165,7 +165,7 @@ func matchMirrorsByPattern(mirrors map[int]string, pattern string) []*MirrorID {
 	return matches
 }
 
-func (c *CLI) ChangeStatus(ctx context.Context, in *ChangeStatusRequest) (*empty.Empty, error) {
+func (c *CLI) ChangeStatus(ctx context.Context, in *ChangeStatusRequest) (*emptypb.Empty, error) {
 	if in.ID <= 0 {
 		return nil, status.Error(codes.FailedPrecondition, "invalid mirror id")
 	}
@@ -179,10 +179,10 @@ func (c *CLI) ChangeStatus(ctx context.Context, in *ChangeStatusRequest) (*empty
 		err = mirrors.DisableMirror(c.redis, int(in.ID))
 	}
 
-	return &empty.Empty{}, err
+	return &emptypb.Empty{}, err
 }
 
-func (c *CLI) List(ctx context.Context, in *empty.Empty) (*MirrorListReply, error) {
+func (c *CLI) List(ctx context.Context, in *emptypb.Empty) (*MirrorListReply, error) {
 	conn, err := c.redis.Connect()
 	if err != nil {
 		return nil, err
@@ -544,7 +544,7 @@ func (c *CLI) setMirror(mirror *mirrors.Mirror) error {
 	return nil
 }
 
-func (c *CLI) RemoveMirror(ctx context.Context, in *MirrorIDRequest) (*empty.Empty, error) {
+func (c *CLI) RemoveMirror(ctx context.Context, in *MirrorIDRequest) (*emptypb.Empty, error) {
 	if in.ID <= 0 {
 		return nil, status.Error(codes.FailedPrecondition, "invalid mirror id")
 	}
@@ -596,11 +596,11 @@ func (c *CLI) RemoveMirror(ctx context.Context, in *MirrorIDRequest) (*empty.Emp
 	// Publish update
 	database.Publish(conn, database.MIRROR_UPDATE, strconv.Itoa(int(in.ID)))
 
-	return &empty.Empty{}, nil
+	return &emptypb.Empty{}, nil
 }
 
-func (c *CLI) RefreshRepository(ctx context.Context, in *RefreshRepositoryRequest) (*empty.Empty, error) {
-	return &empty.Empty{}, scan.ScanSource(c.redis, in.Rehash, nil)
+func (c *CLI) RefreshRepository(ctx context.Context, in *RefreshRepositoryRequest) (*emptypb.Empty, error) {
+	return &emptypb.Empty{}, scan.ScanSource(c.redis, in.Rehash, nil)
 }
 
 func (c *CLI) ScanMirror(ctx context.Context, in *ScanMirrorRequest) (*ScanMirrorReply, error) {
@@ -707,14 +707,14 @@ func (c *CLI) StatsFile(ctx context.Context, in *StatsFileRequest) (*StatsFileRe
 	defer conn.Close()
 
 	// Convert the timestamps
-	start, err := ptypes.Timestamp(in.DateStart)
-	if err != nil {
+	if err = in.DateStart.CheckValid(); err != nil {
 		return nil, err
 	}
-	end, err := ptypes.Timestamp(in.DateEnd)
-	if err != nil {
+	start := in.DateStart.AsTime()
+	if err = in.DateEnd.CheckValid(); err != nil {
 		return nil, err
 	}
+	end := in.DateEnd.AsTime()
 
 	// Compile the regex pattern
 	re, err := regexp.Compile(in.Pattern)
@@ -772,14 +772,14 @@ func (c *CLI) StatsMirror(ctx context.Context, in *StatsMirrorRequest) (*StatsMi
 	defer conn.Close()
 
 	// Convert the timestamps
-	start, err := ptypes.Timestamp(in.DateStart)
-	if err != nil {
+	if err = in.DateStart.CheckValid(); err != nil {
 		return nil, err
 	}
-	end, err := ptypes.Timestamp(in.DateEnd)
-	if err != nil {
+	start := in.DateStart.AsTime()
+	if err = in.DateEnd.CheckValid(); err != nil {
 		return nil, err
 	}
+	end := in.DateEnd.AsTime()
 
 	// Generate the list of redis key for the period
 	tkcoverage := utils.TimeKeyCoverage(start, end)
