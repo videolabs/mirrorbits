@@ -407,3 +407,78 @@ func TestConfiguredLogLevel(t *testing.T) {
 		t.Fatalf("The -debug flag must take precedence over LogLevel")
 	}
 }
+
+func TestLogFilePaths(t *testing.T) {
+	debug := core.Debug
+	runLog := core.RunLog
+	defer func() {
+		core.Debug = debug
+		core.RunLog = runLog
+		SetConfiguration(nil)
+		rlogger.f = nil
+		ReloadRuntimeLogs()
+		dlogger.Lock()
+		dlogger.Close()
+		dlogger.Unlock()
+	}()
+
+	core.Debug = false
+	core.RunLog = ""
+	dir := t.TempDir()
+
+	/* Relative names are created in LogDir */
+	SetConfiguration(&Configuration{LogDir: dir, LogLevel: "INFO", AccessLog: "access.log", RuntimeLog: "runtime.log"})
+	rlogger.f = nil
+	ReloadRuntimeLogs()
+	ReloadDownloadLogs()
+
+	if rlogger.f == os.Stderr || rlogger.f.Name() != dir+"/runtime.log" {
+		t.Fatalf("The runtime log is expected in %s/runtime.log", dir)
+	}
+	testString := "Testing42"
+	log.Error(testString)
+	buf, _ := os.ReadFile(dir + "/runtime.log")
+	if !strings.Contains(string(buf), testString) {
+		t.Fatalf("The runtime log doesn't contain the string %s", testString)
+	}
+	if dlogger.l == nil {
+		t.Fatalf("The download log is expected to be enabled")
+	}
+	if _, err := os.Stat(dir + "/access.log"); err != nil {
+		t.Fatalf("The download log is expected in %s/access.log", dir)
+	}
+
+	/* The -log flag takes precedence over RuntimeLog */
+	core.RunLog = dir + "/flag.log"
+	ReloadRuntimeLogs()
+	if rlogger.f.Name() != core.RunLog {
+		t.Fatalf("The runtime log is expected in %s", core.RunLog)
+	}
+	core.RunLog = ""
+
+	/* Absolute paths are used as is, even without LogDir */
+	SetConfiguration(&Configuration{LogLevel: "INFO", AccessLog: dir + "/abs.log"})
+	ReloadRuntimeLogs()
+	ReloadDownloadLogs()
+
+	if rlogger.f != os.Stderr {
+		t.Fatalf("An empty RuntimeLog is expected to log on Stderr")
+	}
+	if _, err := os.Stat(dir + "/abs.log"); err != nil || dlogger.l == nil {
+		t.Fatalf("The download log is expected in %s/abs.log", dir)
+	}
+
+	/* Relative names without LogDir disable the download log */
+	SetConfiguration(&Configuration{LogLevel: "INFO", AccessLog: "downloads.log"})
+	ReloadDownloadLogs()
+	if dlogger.l != nil {
+		t.Fatalf("The download log is expected to be disabled without LogDir")
+	}
+
+	/* An empty AccessLog disables the download log */
+	SetConfiguration(&Configuration{LogDir: dir, LogLevel: "INFO", AccessLog: ""})
+	ReloadDownloadLogs()
+	if dlogger.l != nil {
+		t.Fatalf("The download log is expected to be disabled")
+	}
+}

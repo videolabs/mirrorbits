@@ -9,6 +9,7 @@ import (
 	"io"
 	stdlog "log"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
@@ -63,7 +64,9 @@ func isTerminal(f *os.File) bool {
 
 // ReloadRuntimeLogs reopens the runtime logs for writing
 func ReloadRuntimeLogs() {
-	if rlogger.f == os.Stderr && core.RunLog == "" {
+	runLog := runtimeLogFile()
+
+	if rlogger.f == os.Stderr && runLog == "" {
 		// Logger already set up and connected to the console.
 		// Don't reload to avoid breaking journald, but apply
 		// the log level in case it changed.
@@ -77,11 +80,11 @@ func ReloadRuntimeLogs() {
 		rlogger.f.Close()
 	}
 
-	if core.RunLog != "" {
+	if runLog != "" {
 		var err error
-		rlogger.f, _, err = openLogFile(core.RunLog)
+		rlogger.f, _, err = openLogFile(runLog)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "Cannot open log file for writing")
+			fmt.Fprintf(os.Stderr, "Cannot open log file %s for writing\n", runLog)
 			rlogger.f = os.Stderr
 		}
 	} else {
@@ -100,6 +103,32 @@ func ReloadRuntimeLogs() {
 		logging.SetFormatter(logging.MustStringFormatter("%{time:2006/01/02 15:04:05.000 MST} %{message}"))
 		logging.SetLevel(configuredLogLevel(), "main")
 	}
+}
+
+// logFilePath returns the path of a log file set in the configuration.
+// Absolute paths are used as is, relative ones are created in LogDir.
+// An empty string is returned when the log is disabled.
+func logFilePath(name string) string {
+	if name == "" || filepath.IsAbs(name) {
+		return name
+	}
+	if GetConfig().LogDir == "" {
+		return ""
+	}
+	return filepath.Join(GetConfig().LogDir, name)
+}
+
+// runtimeLogFile returns the file where the runtime logs are written,
+// or an empty string for stderr. The -log flag takes precedence over
+// the RuntimeLog option.
+func runtimeLogFile() string {
+	if core.RunLog != "" {
+		return core.RunLog
+	}
+	if !IsConfigLoaded() {
+		return ""
+	}
+	return logFilePath(GetConfig().RuntimeLog)
 }
 
 // configuredLogLevel returns the log level set in the configuration,
@@ -151,11 +180,11 @@ func ReloadDownloadLogs() {
 
 	dlogger.Close()
 
-	if GetConfig().LogDir == "" {
+	logfile := logFilePath(GetConfig().AccessLog)
+	if logfile == "" {
 		return
 	}
 
-	logfile := GetConfig().LogDir + "/downloads.log"
 	f, createHeader, err := openLogFile(logfile)
 	if err != nil {
 		log.Criticalf("Cannot open log file %s", logfile)

@@ -44,6 +44,8 @@ func defaultConfig() Configuration {
 		RedisDB:                0,
 		LogDir:                 "",
 		LogLevel:               "INFO",
+		AccessLog:              "downloads.log",
+		RuntimeLog:             "",
 		TraceFileLocation:      "",
 		GeoipDatabasePath:      "/usr/share/GeoIP/",
 		GeographicalSort:       true,
@@ -81,6 +83,8 @@ type Configuration struct {
 	RedisDB                 int        `yaml:"RedisDB"`
 	LogDir                  string     `yaml:"LogDir"`
 	LogLevel                string     `yaml:"LogLevel"`
+	AccessLog               string     `yaml:"AccessLog"`
+	RuntimeLog              string     `yaml:"RuntimeLog"`
 	TraceFileLocation       string     `yaml:"TraceFileLocation"`
 	GeoipDatabasePath       string     `yaml:"GeoipDatabasePath"`
 	GeographicalSort        bool       `yaml:"GeographicalSort"`
