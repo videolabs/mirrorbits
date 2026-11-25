@@ -41,3 +41,24 @@ jobs:
       with:
         name: release-${{ matrix.go-version }}
         path: dist/*
+
+  docker:
+    name: Docker image
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Build
+      run: |
+        docker build -t mirrorbits .
+
+    - name: Run
+      run: |
+        # without a daemon, `version` prints the client version then exits 1
+        out=$(docker run --rm mirrorbits version 2>&1 || true)
+        echo "$out"
+        echo "$out" | grep -q 'Version:'
