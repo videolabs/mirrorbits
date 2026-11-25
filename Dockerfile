@@ -1,22 +1,32 @@
-FROM golang:latest
+# syntax=docker/dockerfile:1
+ARG GO_VERSION=1
 
-LABEL maintainer="etix@l0cal.com"
+FROM docker.io/library/golang:${GO_VERSION}-trixie AS build
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download
+# .git is copied too: the Makefile takes the version from `git describe`
+COPY . .
+# PREFIX=/usr: the templates are looked up in /usr/share/mirrorbits
+RUN CGO_ENABLED=0 make build PREFIX=/usr
 
-ADD . /go/mirrorbits
-
-RUN apt-get update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y pkg-config zlib1g-dev protobuf-compiler libprotoc-dev rsync && \
-    apt-get clean
-RUN go get -u github.com/maxmind/geoipupdate2/cmd/geoipupdate && \
-    go install -ldflags "-X main.defaultConfigFile=/etc/GeoIP.conf -X main.defaultDatabaseDirectory=/usr/share/GeoIP" github.com/maxmind/geoipupdate2/cmd/geoipupdate && \
-    echo "AccountID 0\nLicenseKey 000000000000\nEditionIDs GeoLite2-City GeoLite2-Country GeoLite2-ASN" > /etc/GeoIP.conf && \
-    mkdir /usr/share/GeoIP && \
-    /go/bin/geoipupdate
-RUN mkdir /srv/repo /var/log/mirrorbits && \
-    cd /go/mirrorbits && \
-    make install PREFIX=/usr
-RUN cp /go/mirrorbits/contrib/docker/mirrorbits.conf /etc/mirrorbits.conf
-
-ENTRYPOINT /usr/bin/mirrorbits daemon -config /etc/mirrorbits.conf
-
+# rsync is needed to scan the mirrors with an rsync:// URL. The GeoIP
+# databases are not included: MaxMind requires an account to download them,
+# and they must be updated regularly. Mount them in /usr/share/GeoIP (the
+# default GeoipDatabasePath), e.g. from the ghcr.io/maxmind/geoipupdate image.
+FROM docker.io/library/debian:trixie-slim
+RUN apt-get update \
+ && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+      ca-certificates rsync \
+ && rm -rf /var/lib/apt/lists/* \
+ && useradd --system --no-create-home --home-dir /nonexistent \
+      --shell /usr/sbin/nologin mirrorbits \
+ && mkdir -p /srv/repo /usr/share/GeoIP /var/log/mirrorbits \
+ && chown mirrorbits:mirrorbits /var/log/mirrorbits
+COPY --from=build /src/bin/mirrorbits /usr/bin/mirrorbits
+COPY --from=build /src/templates/ /usr/share/mirrorbits/
+COPY contrib/docker/mirrorbits.conf /etc/mirrorbits.conf
+USER mirrorbits
 EXPOSE 8080
+ENTRYPOINT ["/usr/bin/mirrorbits"]
+CMD ["daemon", "-config", "/etc/mirrorbits.conf"]
