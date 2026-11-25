@@ -82,7 +82,30 @@ You can either get a [prebuilt version](https://github.com/etix/mirrorbits/relea
 
 ### Docker
 
-A docker "quick start" can be found [on the wiki](https://github.com/etix/mirrorbits/wiki/Running-within-Docker).
+Build the image, then run it next to a Redis, with your repository, the GeoIP databases and your configuration mounted:
+
+```
+$ docker build -t mirrorbits .
+$ docker network create mirrorbits
+$ docker run -d --name redis --network mirrorbits redis
+$ docker run -d --name mirrorbits --network mirrorbits -p 8080:8080 \
+    -v /path/to/repo:/srv/repo:ro \
+    -v /path/to/GeoIP:/usr/share/GeoIP:ro \
+    -v /path/to/mirrorbits.conf:/etc/mirrorbits.conf:ro \
+    mirrorbits
+$ docker exec mirrorbits mirrorbits list
+```
+
+The image does not include the GeoIP databases: MaxMind requires a (free) account to download them, and they must be kept up to date. For instance with the [geoipupdate](https://github.com/maxmind/geoipupdate) image:
+
+```
+$ docker run --rm -v /path/to/GeoIP:/usr/share/GeoIP \
+    -e GEOIPUPDATE_ACCOUNT_ID=<id> -e GEOIPUPDATE_LICENSE_KEY=<key> \
+    -e GEOIPUPDATE_EDITION_IDS="GeoLite2-City GeoLite2-ASN" \
+    ghcr.io/maxmind/geoipupdate
+```
+
+The image runs as a non-root user, `/usr/bin/mirrorbits` is the entrypoint: `docker run --rm mirrorbits version`.
 
 ### Manual build
 
